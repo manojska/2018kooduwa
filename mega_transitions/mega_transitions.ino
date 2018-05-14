@@ -67,12 +67,12 @@ void loop() {
   colorBoom(CRGB(255, 0, 140));
  
   for (byte x = 0; x < 10; x++) {
-    colorConsume(CRGB::Red);
-    delay(5000);
-    colorConsume(CRGB::Blue);
-    delay(5000);
-    colorConsume(CRGB(148, 211, 0));
-    delay(5000);
+	colorConsume(CRGB::Red);
+	delay(5000);
+	colorConsume(CRGB::Blue);
+	delay(5000);
+	colorConsume(CRGB(148, 211, 0));
+	delay(5000);
   }    
  
 }
@@ -80,53 +80,52 @@ void loop() {
 
 void colorConsume(CRGB new_color) {
   //set the new color from the bottom and dim the old color little by litle
-  // first work on level2 next level 1
+  // We are lucky because the side of the level 1 has the same number of leds as level 2  
   int anime_delay = 20;
   uint8_t dim_level = 192;
   for (byte i =0; i < SIDE_LENGTH; i++) {
-    level_1[i] = CRGB::White;
-    for (byte j = i+1; j < SIDE_LENGTH; j++) {
-      level_1[j].nscale8_video(dim_level);
-      level_1[2 * SIDE_LENGTH -1 - j].nscale8_video(dim_level);
-      level_1[2 * SIDE_LENGTH + j].nscale8_video(dim_level);
-      level_1[4 * SIDE_LENGTH -1 - j].nscale8_video(dim_level);
-      level_1[4 * SIDE_LENGTH + j].nscale8_video(dim_level);
-      level_1[4 * SIDE_LENGTH - j].nscale8_video(dim_level);
-    }
-    FastLED.show(); delay(anime_delay);
-    level_1[i] = new_color;
-    level_1[2 * SIDE_LENGTH - 1 - i] = new_color;
-    level_1[2 * SIDE_LENGTH + i] = new_color;
-    level_1[4 * SIDE_LENGTH - 1 - i] = new_color;
-    level_1[4 * SIDE_LENGTH + i] = new_color;
-    level_1[6 * SIDE_LENGTH -1 - i] = new_color;
-    FastLED.show(); delay(anime_delay);
+	level_1[i] = CRGB::White;
+	level_2[i] = CRGB::White;
+	for (byte j = i+1; j < SIDE_LENGTH; j++) {
+	  level_1[j].nscale8_video(dim_level);
+	  level_1[2 * SIDE_LENGTH -1 - j].nscale8_video(dim_level);
+	  level_1[2 * SIDE_LENGTH + j].nscale8_video(dim_level);
+	  level_1[4 * SIDE_LENGTH -1 - j].nscale8_video(dim_level);
+	  level_1[4 * SIDE_LENGTH + j].nscale8_video(dim_level);
+	  level_1[6 * SIDE_LENGTH - j].nscale8_video(dim_level);
+	  // level 2 
+	  level_2[j].nscale8_video(dim_level);
+	}
+	FastLED.show(); delay(anime_delay);
+	level_1[i] = new_color;
+	level_1[2 * SIDE_LENGTH - 1 - i] = new_color;
+	level_1[2 * SIDE_LENGTH + i] = new_color;
+	level_1[4 * SIDE_LENGTH - 1 - i] = new_color;
+	level_1[4 * SIDE_LENGTH + i] = new_color;
+	level_1[6 * SIDE_LENGTH -1 - i] = new_color;
+	// Level 2
+	level_2[i] = new_color;
+	FastLED.show(); delay(anime_delay);
   }
 }
 
 void colorBoom( CRGB new_color) {
   // fade current color and boom into next color
   // reduce current color to 75% for 100 times
-  for (int steps =0; steps < 50; steps++) {
-    for (int i = 0; i < LEVEL_2_LEDS; i++) {
-        level_2[i].nscale8_video(192);
+  uint8_t dim_level = 192;
+	for (int steps =0; steps < 50; steps++) {
+  	for (int i = 0; i < LEVEL_2_LEDS; i++) {
+  		level_2[i].nscale8_video(dim_level);
+  	}
+   for (int i = 0; i < LEVEL_1_LEDS; i++) {
+   level_1[i].nscale8_video(dim_level);
    }
   FastLED.show();
   delay(5); 
-  }
+	}
   fill_solid(level_2, LEVEL_2_LEDS, new_color);
-  FastLED.show();
-  // now change color on leve 1 
- for (int steps =0; steps < 100; steps++) {
-    for (int i = 0; i < LEVEL_1_LEDS; i++) {
-        level_1[i].nscale8_video(192);
-   }
-  FastLED.show();
-  delay(5); 
-  }
   fill_solid(level_1, LEVEL_1_LEDS, new_color);
   FastLED.show();
-  
   delay(3000);
 }
 
